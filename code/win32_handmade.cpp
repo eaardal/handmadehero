@@ -1,5 +1,7 @@
 #include <windows.h>
 
+static bool Running;
+
 LRESULT CALLBACK MainWindowCallback(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
 {
   LRESULT Result = 0;
@@ -12,11 +14,13 @@ LRESULT CALLBACK MainWindowCallback(HWND Window, UINT Message, WPARAM WParam, LP
     }
     case WM_DESTROY:
     {
+      Running = false;
       OutputDebugStringA("WM_DESTROY\n");
       break;
     }
     case WM_CLOSE:
     {
+      Running = false;
       OutputDebugStringA("WM_CLOSE\n");
       break;
     }
@@ -60,9 +64,9 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CommandLi
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "HandmadeHeroWindowClass";
 
-  if (RegisterClass(&WindowClass))
+  if (RegisterClassA(&WindowClass))
   {
-    HWND WindowHandle = CreateWindowEx(
+    HWND WindowHandle = CreateWindowExA(
       0,
       WindowClass.lpszClassName,
       "Handmade Hero",
@@ -79,14 +83,14 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CommandLi
 
     if (WindowHandle)
     {
-      MSG Message;
-      for(;;)
+      while(Running)
       {
-        BOOL MessageResult = GetMessage(&Message, 0, 0, 0);
+        MSG Message;
+        BOOL MessageResult = GetMessageA(&Message, 0, 0, 0);
         if (MessageResult > 0)
         {
           TranslateMessage(&Message);
-          DispatchMessage(&Message);
+          DispatchMessageA(&Message);
         }
         else
         {
